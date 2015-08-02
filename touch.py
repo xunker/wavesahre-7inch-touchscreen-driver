@@ -26,9 +26,11 @@ def read_and_emulate_mouse(deviceFound):
         startTime = time.time()
 
         while True:
-            b = f.read(25)
+            b = f.read(22)
             (tag, btnLeft, x, y) = struct.unpack_from('>c?HH', b)
-            print(btnLeft, x, y)
+            x = round(x * 800 / 4000)
+            y = round(y * 480 / 4000)
+            print("=======",tag, btnLeft, x, y)
             time.sleep(0.01) 
 
             if btnLeft:
