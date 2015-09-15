@@ -24,12 +24,17 @@ def read_and_emulate_mouse(deviceFound):
         rightClicked = False
         (lastX, lastY) = (0, 0)
         startTime = time.time()
+        calibration = 22
+        width = 800
+        height = 480
 
         while True:
             b = f.read(22)
             (tag, btnLeft, x, y) = struct.unpack_from('>c?HH', b)
-            x = round(x * 800 / 4000)
-            y = round(y * 480 / 4000)
+            x = round(x * width / 4000)
+            y = round(y * height / 4000)
+            x = x - (x / width * calibration) + calibration
+            y = y - (y / height * calibration) + calibration
             print("=======",tag, btnLeft, x, y)
             time.sleep(0.01) 
 
