@@ -33,8 +33,8 @@ def read_and_emulate_mouse(deviceFound):
             (tag, btnLeft, x, y) = struct.unpack_from('>c?HH', b)
             x = round(x * width / 4000)
             y = round(y * height / 4000)
-            x = x - (x / width * calibration) + calibration
-            y = y - (y / height * calibration) + calibration
+            x = int(x - (x / width * calibration) + calibration)
+            y = int(y - (y / height * calibration) + calibration)
             print("=======",tag, btnLeft, x, y)
             time.sleep(0.01) 
 
