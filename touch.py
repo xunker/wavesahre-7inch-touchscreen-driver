@@ -8,6 +8,18 @@ import uinput
 import pyudev
 import os
 
+
+def translate(value, leftMin, leftMax, rightMin, rightMax):
+    # Figure out how 'wide' each range is
+    leftSpan = leftMax - leftMin
+    rightSpan = rightMax - rightMin
+
+    # Convert the left range into a 0-1 range (float)
+    valueScaled = float(value - leftMin) / float(leftSpan)
+
+    # Convert the 0-1 range into a value in the right range.
+    return rightMin + (valueScaled * rightSpan)
+
 # Wait and find devices
 def read_and_emulate_mouse(deviceFound):
     with open(deviceFound, 'rb') as f:
@@ -28,19 +40,31 @@ def read_and_emulate_mouse(deviceFound):
         width = 800
         height = 480
 
+        screen_x_min = 110
+        screen_x_max = 3980
+        screen_y_min = 280
+        screen_y_max = 3860
+
         while True:
             b = f.read(22)
             (tag, btnLeft, x, y) = struct.unpack_from('>c?HH', b)
-            x = round(x * width / 4000)
-            y = round(y * height / 4000)
-            x = int(x - (x / width * calibration) + calibration)
-            y = int(y - (y / height * calibration) + calibration)
-            print("=======",tag, btnLeft, x, y)
+            print("A=======",tag, btnLeft, x, y)
+            #x = round(x * width / 4000)
+            #y = round(y * height / 4000)
+            #x = int(x - (x / width * calibration) + calibration)
+            #y = int(y - (y / height * calibration) + calibration)
+            x = int(translate(x, screen_x_min, screen_x_max, 0, width))
+            y = int(translate(y, screen_y_min, screen_y_max, 0, height))
+            print("B=======",tag, btnLeft, x, y)
             time.sleep(0.01) 
 
             if btnLeft:
-                device.emit(uinput.ABS_X, x, True)
-                device.emit(uinput.ABS_Y, y, True)
+                if x > 0:
+                    print("X:", x)
+                    device.emit(uinput.ABS_X, x, True)
+                if y > 0:
+                    print("Y:", y)
+                    device.emit(uinput.ABS_Y, y, True)
 
                 if not clicked:
                     print("Left click")
@@ -62,7 +86,6 @@ def read_and_emulate_mouse(deviceFound):
                 clicked = False
                 rightClicked = False
                 device.emit(uinput.BTN_LEFT, 0)
-
 
 if __name__ == "__main__":
     os.system("modprobe uinput")
