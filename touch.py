@@ -48,26 +48,22 @@ def read_and_emulate_mouse(deviceFound):
         while True:
             b = f.read(22)
             (tag, btnLeft, x, y) = struct.unpack_from('>c?HH', b)
-            print("A=======",tag, btnLeft, x, y)
-            #x = round(x * width / 4000)
-            #y = round(y * height / 4000)
-            #x = int(x - (x / width * calibration) + calibration)
-            #y = int(y - (y / height * calibration) + calibration)
+            # print("A=======",tag, btnLeft, x, y)
             x = int(translate(x, screen_x_min, screen_x_max, 0, width))
             y = int(translate(y, screen_y_min, screen_y_max, 0, height))
-            print("B=======",tag, btnLeft, x, y)
+            # print("B=======",tag, btnLeft, x, y)
             time.sleep(0.01) 
 
             if btnLeft:
                 if x > 0:
-                    print("X:", x)
+                    # print("X:", x)
                     device.emit(uinput.ABS_X, x, True)
                 if y > 0:
-                    print("Y:", y)
+                    # print("Y:", y)
                     device.emit(uinput.ABS_Y, y, True)
 
                 if not clicked:
-                    print("Left click")
+                    # print("Left click")
                     device.emit(uinput.BTN_LEFT, 1)
                     clicked = True
                     startTime = time.time()
@@ -77,12 +73,12 @@ def read_and_emulate_mouse(deviceFound):
                 movement = math.sqrt(pow(x - lastX, 2) + pow(y - lastY, 2))
 
                 if clicked and (not rightClicked) and (duration > 1) and (movement < 20):
-                    print("Right click")
+                    # print("Right click")
                     device.emit(uinput.BTN_RIGHT, 1)
                     device.emit(uinput.BTN_RIGHT, 0)
                     rightClicked = True
             else:
-                print("Release")
+                # print("Release")
                 clicked = False
                 rightClicked = False
                 device.emit(uinput.BTN_LEFT, 0)
